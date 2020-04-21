@@ -13,6 +13,12 @@ AFRAME.registerComponent('networked-audio-source', {
     rolloffFactor: { default: 1 }
   },
 
+  getOwner: function() {
+    NAF.utils.getNetworkedEntity(this.el).then((networkedEl) => {
+      return networkedEl.components.networked.data.owner
+    })
+  },
+
   init: function () {
     this.listener = null;
     this.stream = null;
@@ -21,10 +27,11 @@ AFRAME.registerComponent('networked-audio-source', {
 
     NAF.utils.getNetworkedEntity(this.el).then((networkedEl) => {
       const ownerId = networkedEl.components.networked.data.owner;
+      console.log("Checking media stream for " + ownerId);
 
       if (ownerId) {
         NAF.connection.adapter.getMediaStream(ownerId)
-          .then(this._setMediaStream)
+          .then(this._setMediaStream).then(()=>console.log("Successfully set media stream for " + ownerId))
           .catch((e) => naf.log.error(`Error getting media stream for ${ownerId}`, e));
       } else {
         // Correctly configured local entity, perhaps do something here for enabling debug audio loopback
