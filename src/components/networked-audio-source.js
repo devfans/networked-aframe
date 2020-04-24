@@ -44,15 +44,21 @@ AFRAME.registerComponent('networked-audio-source', {
   },
 
   _setMediaStream(newStream) {
+    console.log("Checking 1")
     if(!this.sound) {
       this.setupSound();
+    console.log("Checking 2")
     }
 
     if(newStream != this.stream) {
+    
+      console.log("Checking 3")
       if(this.stream) {
         this.sound.disconnect();
+        console.log("Checking 4")
       }
       if(newStream) {
+        console.log("Checking 5")
         // Chrome seems to require a MediaStream be attached to an AudioElement before AudioNodes work correctly
         // We don't want to do this in other browsers, particularly in Safari, which actually plays the audio despite
         // setting the volume to 0.
@@ -70,6 +76,7 @@ AFRAME.registerComponent('networked-audio-source', {
       }
       this.stream = newStream;
     }
+        console.log("Checking 6")
   },
 
   _setPannerProperties() {

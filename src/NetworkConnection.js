@@ -137,7 +137,7 @@ class NetworkConnection {
   }
 
   dataChannelClosed(clientId) {
-    NAF.log.write('Closed data channel from ' + clientId);
+    console.log('Closed data channel from ' + clientId);
     this.activeDataChannels[clientId] = false;
     this.entities.removeEntitiesOfClient(clientId);
 

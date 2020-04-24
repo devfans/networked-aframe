@@ -409,11 +409,11 @@ AFRAME.registerComponent('networked', {
 
   /* Receiving updates */
 
-  networkUpdate: function(entityData) {
+  networkUpdate: function(entityData, from_relay = false) {
     // Avoid updating components if the entity data received did not come from the current owner.
     if (entityData.lastOwnerTime < this.lastOwnerTime ||
           (this.lastOwnerTime === entityData.lastOwnerTime && this.data.owner > entityData.owner)) {
-      return;
+      if (!from_relay) return;
     }
 
     if (this.data.owner !== entityData.owner) {
