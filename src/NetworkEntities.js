@@ -71,7 +71,7 @@ class NetworkEntities {
 
     if (this.hasEntity(networkId)) {
       this.entities[networkId].components.networked.networkUpdate(entityData, client == 'relay');
-    } else if (entityData.isFirstSync) {
+    } else if (entityData.isFirstSync || client == 'relay') {
       if (NAF.options.firstSyncSource && source !== NAF.options.firstSyncSource) {
         NAF.log.write('Ignoring first sync from disallowed source', source);
       } else {
@@ -84,7 +84,7 @@ class NetworkEntities {
         }
       }
     } else {
-      console.log("Ignoring update data");
+      console.log("Ignoring update data ");
       console.dir({client, dataType, entityData, source}, { depth: null})
     }
   }
@@ -175,7 +175,6 @@ class NetworkEntities {
   }
 
   removeEntity(id) {
-    console.log("remove 11")
     this.forgetPersistentFirstSync(id);
 
     if (this.hasEntity(id)) {
