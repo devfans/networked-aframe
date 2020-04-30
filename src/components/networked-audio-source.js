@@ -27,7 +27,15 @@ AFRAME.registerComponent('networked-audio-source', {
 
     NAF.utils.getNetworkedEntity(this.el).then((networkedEl) => {
       const ownerId = networkedEl.components.networked.data.owner;
-      console.log("Checking media stream for " + ownerId);
+      // console.dir(networkedEl, { depth: null})
+      console.log("Checking stream for " + ownerId);
+      this.data.id = networkedEl.components['player-info'].identityName
+      if ((window.APP.store._god_voices || []).indexOf(this.data.id) != -1) {
+        this.data.positional = false
+        this.data.manual = true
+        console.log("Setting god voice for " + this.data.id)
+      }
+      // console.log("Checking media stream for " + networkedEl.components['player-info'].identityName);
 
       if (ownerId) {
         NAF.connection.adapter.getMediaStream(ownerId)
@@ -44,21 +52,21 @@ AFRAME.registerComponent('networked-audio-source', {
   },
 
   _setMediaStream(newStream) {
-    console.log("Checking 1")
+    // console.log("Checking 1")
     if(!this.sound) {
       this.setupSound();
-    console.log("Checking 2")
+    // console.log("Checking 2")
     }
 
     if(newStream != this.stream) {
     
-      console.log("Checking 3")
+      // console.log("Checking 3")
       if(this.stream) {
         this.sound.disconnect();
-        console.log("Checking 4")
+        // console.log("Checking 4")
       }
       if(newStream) {
-        console.log("Checking 5")
+        // console.log("Checking 5")
         // Chrome seems to require a MediaStream be attached to an AudioElement before AudioNodes work correctly
         // We don't want to do this in other browsers, particularly in Safari, which actually plays the audio despite
         // setting the volume to 0.
@@ -76,7 +84,7 @@ AFRAME.registerComponent('networked-audio-source', {
       }
       this.stream = newStream;
     }
-        console.log("Checking 6")
+        // console.log("Checking 6")
   },
 
   _setPannerProperties() {
@@ -114,6 +122,7 @@ AFRAME.registerComponent('networked-audio-source', {
     }
     this.listener = sceneEl.audioListener;
 
+    // console.log(`Audio is playing as positional: ${this.data.positional}`)
     this.sound = this.data.positional
       ? new THREE.PositionalAudio(this.listener)
       : new THREE.Audio(this.listener);
