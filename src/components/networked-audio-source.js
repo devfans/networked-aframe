@@ -4,6 +4,8 @@ var naf = require('../NafIndex');
 AFRAME.registerComponent('networked-audio-source', {
   schema: {
     positional: { default: true },
+    manual: { default: false },
+    speaker: { default: false },
     distanceModel: {
       default: "inverse",
       oneOf: ["linear", "inverse", "exponential"]
@@ -19,33 +21,54 @@ AFRAME.registerComponent('networked-audio-source', {
     })
   },
 
+  updateSpeakerSource() {
+    if (NAF._disconnect_guest) {
+      if (this.sound) this.sound.disconnect();
+      this.stream = null
+      console.log("Disconnected guest speaker " + this.data.source)
+    }
+
+    if (NAF._connect_guest && this.data.source != NAF.guest.id) {
+      console.log("Connecting guest speaker " + NAF.guest.id)
+      this.data.source = NAF.guest.id
+      NAF.connection.adapter.getMediaStream(NAF.guest.id)
+            .then(this._setMediaStream).then(()=>console.log("Successfully set media stream for " + NAF.guest.id))
+            .catch((e) => naf.log.error(`Error getting media stream for ${NAF.guest.id}`, e));
+    }
+  },
+
   init: function () {
+    // console.dir(this.data)
     this.listener = null;
     this.stream = null;
 
     this._setMediaStream = this._setMediaStream.bind(this);
 
-    NAF.utils.getNetworkedEntity(this.el).then((networkedEl) => {
-      const ownerId = networkedEl.components.networked.data.owner;
-      // console.dir(networkedEl.components, { depth: null})
-      const displayName = (networkedEl.components['player-info'] || {}).displayName
-      console.log("Checking stream for " + ownerId + " id " +  displayName);
-      this.data.id = networkedEl.components['player-info'].identityName
-      if ((window.APP.store._god_voices || []).indexOf(this.data.id) != -1) {
-        this.data.positional = false
-        this.data.manual = true
-        console.log("Setting god voice for " + this.data.id)
-      }
-      // console.log("Checking media stream for " + networkedEl.components['player-info'].identityName);
+    if (window._solution == 2 && this.data.speaker) {
+      window.addEventListener('guestspeaker_update', this.updateSpeakerSource.bind(this))
+    } else {
+      NAF.utils.getNetworkedEntity(this.el).then((networkedEl) => {
+        const ownerId = networkedEl.components.networked.data.owner;
+        // console.dir(networkedEl.components, { depth: null})
+        const displayName = (networkedEl.components['player-info'] || {}).displayName
+        console.log("Checking stream for " + ownerId + " id " +  displayName);
+        this.data.id = networkedEl.components['player-info'].identityName
+        if ((window.APP.store._god_voices || []).indexOf(this.data.id) != -1) {
+          this.data.positional = false
+          this.data.manual = true
+          console.log("Setting god voice for " + this.data.id)
+        }
+        // console.log("Checking media stream for " + networkedEl.components['player-info'].identityName);
 
-      if (ownerId) {
-        NAF.connection.adapter.getMediaStream(ownerId)
-          .then(this._setMediaStream).then(()=>console.log("Successfully set media stream for " + ownerId))
-          .catch((e) => naf.log.error(`Error getting media stream for ${ownerId}`, e));
-      } else {
-        // Correctly configured local entity, perhaps do something here for enabling debug audio loopback
-      }
-    });
+        if (ownerId) {
+          NAF.connection.adapter.getMediaStream(ownerId)
+            .then(this._setMediaStream).then(()=>console.log("Successfully set media stream for " + ownerId))
+            .catch((e) => naf.log.error(`Error getting media stream for ${ownerId}`, e));
+        } else {
+          // Correctly configured local entity, perhaps do something here for enabling debug audio loopback
+        }
+      });
+    }
   },
 
   update() {
