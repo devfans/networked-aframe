@@ -282,7 +282,8 @@ AFRAME.registerComponent('networked', {
     var syncData = this.createSyncData(components, isFirstSync);
 
     if (targetClientId) {
-      NAF.connection.sendDataGuaranteed(targetClientId, 'u', syncData);
+      // NAF.connection.sendDataGuaranteed(targetClientId, 'u', syncData);
+      NAF.connection.adapter.sendDataGuaranteed(targetClientId, 'u', syncData);
     } else {
       NAF.connection.broadcastDataGuaranteed('u', syncData);
     }

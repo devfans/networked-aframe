@@ -44,7 +44,7 @@ AFRAME.registerComponent('networked-audio-source', {
 
     this._setMediaStream = this._setMediaStream.bind(this);
 
-    if (window._solution == 2 && this.data.speaker) {
+    if (NAF._solution == 2 && this.data.speaker) {
       window.addEventListener('guestspeaker_update', this.updateSpeakerSource.bind(this))
     } else {
       NAF.utils.getNetworkedEntity(this.el).then((networkedEl) => {

@@ -165,7 +165,14 @@ class NetworkConnection {
         this.adapter.sendData(toClientId, dataType, data);
       }
     } else {
-      // console.error("NOT-CONNECTED", "not connected to " + toClient);
+      /*
+      if (guaranteed) {
+        this.adapter.sendDataGuaranteed(toClientId, dataType, data);
+      } else {
+        this.adapter.sendData(toClientId, dataType, data);
+      }
+      */
+      console.info("NOT-CONNECTED", "not connected to " + toClientId);
     }
   }
 
